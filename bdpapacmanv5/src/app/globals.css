@@ -277,3 +277,41 @@ button.secondary {
   color: var(--white);
   border: 1px solid var(--line);
 }
+
+.speed-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+}
+
+.speed-label {
+  font-size: 0.9rem;
+  color: rgba(237, 242, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.speed-btn {
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.speed-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.speed-btn.active {
+  background: #ffd54a;
+  color: #06111d;
+  font-weight: 700;
+  border-color: #ffd54a;
+}

@@ -32,6 +32,7 @@ type GameState = {
   combo: number;
   message: string;
   deathTimer: number;
+  speedMultiplier: number;
 };
 
 type Action =
@@ -39,7 +40,8 @@ type Action =
   | { type: "START" }
   | { type: "RESET" }
   | { type: "TICK" }
-  | { type: "RESUME_AFTER_DEATH" };
+  | { type: "RESUME_AFTER_DEATH" }
+  | { type: "SET_SPEED"; speedMultiplier: number };
 
 const BOARD_TEMPLATE = [
   "###############",
@@ -248,6 +250,7 @@ const buildInitialState = (): GameState => {
     combo: 0,
     message: "Press any arrow key or WASD to start",
     deathTimer: DEATH_MS,
+    speedMultiplier: 1,
   };
 };
 
@@ -308,6 +311,12 @@ function gameReducer(state: GameState, action: Action): GameState {
         combo: 0,
         message: "Try again!",
         deathTimer: DEATH_MS,
+      };
+    }
+    case "SET_SPEED": {
+      return {
+        ...state,
+        speedMultiplier: action.speedMultiplier,
       };
     }
     case "TICK": {
@@ -469,9 +478,10 @@ export default function Home() {
 
   useEffect(() => {
     if (game.phase === "playing") {
+      const adjustedTickMs = TICK_MS / game.speedMultiplier;
       const interval = window.setInterval(() => {
         dispatch({ type: "TICK" });
-      }, TICK_MS);
+      }, adjustedTickMs);
 
       return () => window.clearInterval(interval);
     }
@@ -485,7 +495,7 @@ export default function Home() {
     }
 
     return undefined;
-  }, [game.phase]);
+  }, [game.phase, game.speedMultiplier]);
 
   const board = useMemo(() => BOARD_TEMPLATE.map((row) => row.split("")), []);
   const rows = board.length;
@@ -561,6 +571,23 @@ export default function Home() {
           )}
 
           <p className="status-line">{game.message}</p>
+          
+          <div className="speed-selector">
+            <span className="speed-label">Speed:</span>
+            <button 
+              className={`speed-btn ${game.speedMultiplier === 1 ? "active" : ""}`}
+              onClick={() => dispatch({ type: "SET_SPEED", speedMultiplier: 1 })}
+            >
+              Normal
+            </button>
+            <button 
+              className={`speed-btn ${game.speedMultiplier === 0.5 ? "active" : ""}`}
+              onClick={() => dispatch({ type: "SET_SPEED", speedMultiplier: 0.5 })}
+            >
+              50%
+            </button>
+          </div>
+          
           <div className="actions">
             {(game.phase === "ready" || game.phase === "won" || game.phase === "lost") && (
               <button onClick={handlePrimaryAction}>
